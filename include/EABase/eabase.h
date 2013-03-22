@@ -106,26 +106,28 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 // ------------------------------------------------------------------------
-// By default, GCC on certain platforms defines NULL as ((void*)0), which is the
-// C definition. This causes all sort of problems for C++ code, so it is
-// worked around by undefining NULL.
+// Do not attempt to redefine NULL on Apple platforms.  Doing so breaks
+// sentinels in Objective-C++.
+#if !defined(EA_PLATFORM_APPLE) && !defined(nil)
+    // ------------------------------------------------------------------------
+    // By default, GCC on certain platforms defines NULL as ((void*)0), which is the
+    // C definition. This causes all sort of problems for C++ code, so it is
+    // worked around by undefining NULL.
+#  if defined(NULL)
+#    undef NULL
+#  endif
 
-#if defined(NULL)
-#  undef NULL
+    // ------------------------------------------------------------------------
+    // Define the NULL pointer. This is normally defined in <stddef.h>, but we
+    // don't want to force a global dependency on that header, so the definition
+    // is duplicated here.
+#  if defined(__cplusplus)
+#    define NULL 0
+#  else
+#    define NULL ((void*)0)
+#  endif
+
 #endif
-
-
-// ------------------------------------------------------------------------
-// Define the NULL pointer. This is normally defined in <stddef.h>, but we
-// don't want to force a global dependency on that header, so the definition
-// is duplicated here.
-
-#if defined(__cplusplus)
-#  define NULL 0
-#else
-#  define NULL ((void*)0)
-#endif
-
 
 // ------------------------------------------------------------------------
 // C98/99 Standard typedefs. From the ANSI ISO/IEC 9899 standards document
